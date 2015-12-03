@@ -78,6 +78,7 @@ class MutableString
             $startPos = $pos + $len;
         }
         $result .= substr($this->string, $startPos);
+
         return $result;
     }
 }
