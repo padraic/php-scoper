@@ -66,24 +66,18 @@ class MutableString
     public function getModifiedString()
     {
         // Sort by position
-        usort($this->modifications, function ($a, $b) {
-            if ($a[0] === $b[0]) {
-                return 0;
-            }
-
-            return $a[0] > $b[0] ? 1 : -1;
+        usort($this->modifications, function($a, $b) {
+            return $a[0] <=> $b[0];
         });
+
         $result = '';
         $startPos = 0;
-
         foreach ($this->modifications as list($pos, $len, $newString)) {
             $result .= substr($this->string, $startPos, $pos - $startPos);
             $result .= $newString;
             $startPos = $pos + $len;
         }
-
         $result .= substr($this->string, $startPos);
-
         return $result;
     }
 }
