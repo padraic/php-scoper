@@ -65,7 +65,6 @@ EOF;
 
 namespace MyPrefix\MyNamespace;
 
-
 EOF;
 
         $this->assertEquals($expected, $this->scoper->addNamespacePrefix($content, 'MyPrefix'));
