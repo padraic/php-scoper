@@ -105,4 +105,33 @@ EOF;
 
         $this->assertEquals($expected, $this->scoper->addNamespacePrefix($content, 'MyPrefix'));
     }
+
+    public function testSomething()
+    {
+        $content = <<<EOF
+<?php
+
+namespace MyNamespace;
+
+use MyOtherNamespace\MyClass;
+
+class MyClass
+{
+}
+EOF;
+
+        $expected = <<<EOF
+<?php
+
+namespace MyPrefix\MyNamespace;
+
+use MyPrefix\MyOtherNamespace\MyClass;
+
+class MyClass
+{
+}
+EOF;
+
+        $this->assertEquals($expected, $this->scoper->addNamespacePrefix($content, 'MyPrefix'));
+    }
 }
