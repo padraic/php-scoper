@@ -2,6 +2,10 @@
 
 namespace Webmozart\PhpScoper\Util;
 
+/**
+ * @copyright  Copyright (c) 2015 by Nikita Popov
+ * @license    https://github.com/nikic/TypeUtil/blob/master/LICENSE New BSD License
+ */
 class MutableString
 {
     /**
