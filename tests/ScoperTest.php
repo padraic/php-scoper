@@ -106,7 +106,7 @@ EOF;
         $this->assertEquals($expected, $this->scoper->addNamespacePrefix($content, 'MyPrefix'));
     }
 
-    public function testSomething()
+    public function testSpacingBetweenNamespaceDeclarationUseStatementsAndCodeUnchanged()
     {
         $content = <<<EOF
 <?php
