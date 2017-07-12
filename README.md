@@ -106,12 +106,12 @@ return [
     'patchers' => [
         function (string $filePath, string $prefix, string $content): string {
             //
-            // PHP-Parser patch
+            // PHP-Parser patch conditions for file targets
             //
             if ($filePath === '/path/to/offending/file') {
                 return preg_replace(
                     "%\$class = 'Humbug\\\\Format\\\\Type\\\\' . \$type;%",
-                    '$class = $scopedPrefix . \'\\\\Humbug\\\\Format\\\\Type\\\\\' . $type;',
+                    '$class = \'' . $prefix . '\\\\Humbug\\\\Format\\\\Type\\\\\' . $type;',
                     $content
                 );
             }
@@ -155,10 +155,10 @@ non-namespaced PHPUnit packages are prefixed.
 
 ## Building A Scoped PHAR
 
-This is a brief run through of the steps encoded in PHP-Scoper's own
+This is a brief run through of the basic steps encoded in PHP-Scoper's own
 [Makefile](Makefile) and elsewhere to build a PHAR from scoped code.
 
-###Step 1: Configure building the PHAR from `./build`
+### Step 1: Configure build location and prep vendors
 
 If, for example, you are using [Box](box) to build your PHAR, you
 should set the `base-path` configuration option in your `box.json` file
@@ -168,11 +168,58 @@ to point at the 'build' directory which will host scoped code.
 "base-path": "build"
 ```
 
-###Step 2:
+Assuming you need no dev dependencies, run:
 
-TBD
-TBD
-TBD
+```bash
+composer install --no-dev --prefer-dist
+```
+
+### Step 2: Run PHP-Scoper
+
+PHP-Scoper copies code to a new location during prefixing, leaving your original
+code untouched. The default location is `./build`. You can change the default
+location using the `--output-dir` option. By default, it also generates a random
+prefix string. You can set a specific prefix string using the `--prefix` option.
+If automating builds, you can set the `--force` option to overwrite any code
+existing in the output directory without being asked to confirm.
+
+Onto the basic command assuming default options from your project's root
+directory:
+
+```bash
+bin/php-scoper add-prefix
+```
+
+As there are no path arguments, the current working directory will be scoped to
+`./build` in its entirety. Of course, actual prefixing is limited to PHP files,
+or PHP scripts. Other files are copied unchanged, though we also need to scope
+certain Composer related files.
+
+Speaking of scoping Composer related files...the next step is to dump the
+Composer autoloader if we depend on it, so everything works as expected:
+
+```bash
+composer dump-autoload -d build --classmap-authoritative
+```
+
+### Step 3: Build, test, and cleanup
+
+If using [Box](box), you can now move onto actually building the PHAR:
+
+```bash
+php -d phar.readonly=0 box build -vvv
+```
+
+At this point, it's best to have some simple end-to-end tests automated to put
+the PHAR through its paces and locate any problems (see Patchers and Whitelists
+from earlier in this README). Assuming it passes testing, the PHAR is ready.
+
+Cleanup is simply to optionally delete `./build` contents, and remember to
+re-install dev dependencies removed during Step 1:
+
+```bash
+composer install
+``` 
 
 ## Credits
 
